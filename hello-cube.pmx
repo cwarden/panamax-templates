@@ -1,0 +1,46 @@
+---
+name: hello-cube
+description: An example app built from the cube template and a simple hello world
+  node.js docker image.
+keywords: ''
+type: Default
+documentation: See http://xn.pinkhamster.net/blog/tech/building-multi-container-apps-with-panamax.html
+images:
+- name: dockerfile_mongodb_latest
+  source: dockerfile/mongodb:latest
+  category: Database
+  type: Default
+  command: mongod --smallfiles
+- name: cwarden_cube-collector
+  source: cwarden/cube-collector:latest
+  category: Apps
+  type: Default
+  ports:
+  - host_port: '1080'
+    container_port: '1080'
+    proto: TCP
+  links:
+  - service: dockerfile_mongodb_latest
+    alias: mongodb
+- name: cwarden_cube-evaluator
+  source: cwarden/cube-evaluator:latest
+  category: Apps
+  type: Default
+  ports:
+  - host_port: '1081'
+    container_port: '1080'
+    proto: TCP
+  links:
+  - service: dockerfile_mongodb_latest
+    alias: mongodb
+- name: cwarden_hello-cube
+  source: cwarden/hello-cube:latest
+  category: Apps
+  type: Default
+  ports:
+  - host_port: '8080'
+    container_port: '8080'
+    proto: TCP
+  links:
+  - service: cwarden_cube-collector
+    alias: cube-collector
